@@ -30,9 +30,14 @@ async def create_item(item: Item):
 
 
 # using model_dump instead of items because of pydantic v2
+# Pydantic model - > request body
+# singular type - > query parameter
 @app.put("/items/{item_id}")
-async def update_item(item_id: int, item: Item):
-    return {"item_id": item_id, **item.model_dump()}
+async def update_item(item_id: int, item: Item, q: str | None = None):
+    result = {"item_id": item_id, **item.model_dump()}
+    if q:
+        result.update({"q": q})
+    return result
 
 
 # When you declare other function parameters that are not part of the path parameters
