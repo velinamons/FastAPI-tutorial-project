@@ -2,6 +2,8 @@ from enum import Enum
 
 from fastapi import FastAPI
 
+from pydantic_models import Item
+
 
 # By inheriting from str the API docs will know that the values must be type string
 # and will be able to render correctly
@@ -15,6 +17,22 @@ app = FastAPI()
 
 
 fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+
+
+# declare its type as the model you created - Item
+@app.post("/items/")
+async def create_item(item: Item):
+    item_dict = item.model_dump()
+    if item.tax:
+        price_with_tax = item.price + item.tax
+        item_dict.update({"price_with_tax": price_with_tax})
+    return item_dict
+
+
+# using model_dump instead of items because of pydantic v2
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item):
+    return {"item_id": item_id, **item.model_dump()}
 
 
 # When you declare other function parameters that are not part of the path parameters
