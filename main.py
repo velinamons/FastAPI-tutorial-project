@@ -52,3 +52,10 @@ async def get_model(model_name: ModelName):
     # You can return enum members from your path operation
     # They will be converted to their corresponding values before returning
     return {"model_name": model_name, "message": "Have some residuals"}
+
+
+# Path parameters containing paths
+# :path option directly from Starlette
+@app.get("/files/{file_path:path}")
+async def read_file(file_path: str):
+    return {"file_path": file_path}
