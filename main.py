@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 
 from pydantic_models import Item
 
@@ -43,8 +44,11 @@ async def update_item(item_id: int, item: Item, q: str | None = None):
 # When you declare other function parameters that are not part of the path parameters
 # they are automatically interpreted as "query" parameters
 @app.get("/items/")
-async def read_item(skip: int = 0, limit: int = 10):
-    return fake_items_db[skip : skip + limit]
+async def read_item(skip: int = 0, limit: int = 10, q: Annotated[str | None, Query(max_length=50)] = None):
+    results = {"items": fake_items_db[skip:skip + limit]}
+    if q:
+        results.update({"q": q})
+    return results
 
 
 @app.get("/")
